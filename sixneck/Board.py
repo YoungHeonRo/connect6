@@ -4,6 +4,7 @@ class Board:
         self.state = [[0 for i in range(size)] for j in range(size)]
         self.threat = [[0 for i in range(size)] for j in range(size)]
         self.count = 0
+        self.prev = []
 
     def player_in_turn(self):
         return 1 if self.count % 4 in [0, 3] else 2
@@ -13,7 +14,7 @@ class Board:
     def update(self, x, y):
         #color = 'black' if self.player_in_turn() == 1 else 'white'
         #print(color + ':', str(x), str(y))
-        
+        self.prev = (x,y)
         self.state[x][y] = self.player_in_turn()
         winner = self.check(x, y)
 

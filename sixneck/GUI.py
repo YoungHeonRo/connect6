@@ -75,7 +75,7 @@ class Game(tk.Frame):
 
         if board.player_in_turn() != self.human:
             if board.count % 2 == 1:
-                defensive_moves = self.ai.threatMove(board, [(x,y)])
+                defensive_moves = self.ai.threatMove(board, [(x,y), board.prev])
             tx, ty = self.ai.get_move(board, self.ai.defensive_moves)
             self.doMove(tx,ty)
         
