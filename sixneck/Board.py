@@ -20,6 +20,9 @@ class Board:
         self.count += 1
 
         return winner
+
+    #def getMove(self):
+
     
     # check if the game is end (input: (x, y) of the last move / output: winner)
     # <winner> 0: draw, 1: black wins, 2: white wins, -1: no winner yet

@@ -11,7 +11,7 @@ class rule_based_AI():
         self.color = color
 
     def threatMove(self, board, prev_moves):
-        threat = [[0 for i in range(board.size)] for j in range(board.size)]
+        #threat = [[0 for i in range(board.size)] for j in range(board.size)]
 
         for x, y in prev_moves:
             #x-axis
@@ -91,29 +91,24 @@ class rule_based_AI():
                     for x,y in empty_idx:
                         board.threat[x][y] += 1
 
-        max_threat=0
         defensive_moves = []
         #make a list of moves with max_threat(>=2)
         for i in range(board.size):
             for j in range(board.size):
-                if threat[i][j] > max_threat:
-                    defensive_moves.clear()
-                    defensive_moves.append([i,j])
-                    max_threat = threat[i][j]
-                elif threat[i][j] == max_threat:
-                    defensive_moves.append([i,j])
+                if board.threat[i][j] >= 2:
+                    defensive_moves.append( (i,j,board.threat[i][j]) )
+        print(defensive_moves)
+        sorted(defensive_moves, key=lambda a:a[2], reverse=True)
+        defensive_moves = [(i,j) for i,j,k in defensive_moves][:5] 
+        print(defensive_moves)
 
-        if max_threat < 2 :
-            self.defensive_moves = []
-            return []
-        else :
-            self.defensive_moves = defensive_moves
-            return defensive_moves
+        self.defensive_moves = defensive_moves
+        return defensive_moves
 
     def get_move(self, board, defensive_moves):
+        top_score = []
         if len(defensive_moves)==1 :
-            i, j = defensive_moves
-            defensive_moves.clear()
+            i, j = defensive_moves[0]
             return i,j
         else :
             #do halfMove within defensive_moves
@@ -121,8 +116,9 @@ class rule_based_AI():
             for i in range(0,19):
                 for j in range(0,19):
                     if board.state[i][j] != 0: continue
-                    if len(defensive_moves) > 1 and [i, j] not in defensive_moves:
+                    if len(defensive_moves) > 1 and (i, j) not in defensive_moves:
                         continue
+                    print()
                     temp1 = halfMove(board, i, j, self.color)
                     #temp2 = halfMove(board, i, j, 3 - self.color)
                     #print(temp,end=' ')
