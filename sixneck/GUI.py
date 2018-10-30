@@ -1,6 +1,7 @@
 import tkinter as tk
 
 from Board import *
+from Player import *
 
 size = 19
 canvas_size = size*30 + 30
@@ -10,6 +11,7 @@ class Game(tk.Frame):
         super().__init__(master)
         self.pack()
         self.human = 1
+        self.ai = init_player(3 - self.human, 'rb')
         self.init_board()
         self.init_widgets()
 
@@ -69,11 +71,13 @@ class Game(tk.Frame):
                 #print(['draw', 'black won', 'white won'][winner])
                 self.last_move['text'] = ['draw', 'black won', 'white won'][winner]
                 self.canvas.unbind('<Button-1>')
+                return
 
         if board.player_in_turn() != self.human:
-            #x, y = AI_move(board)
-            #self.doMove(x, y)
-            pass
+            if board.count % 2 == 1:
+                defensive_moves = self.ai.threatMove(board, [(x,y)])
+            tx, ty = self.ai.get_move(board, self.ai.defensive_moves)
+            self.doMove(tx,ty)
         
 root = tk.Tk()
 game = Game(root)

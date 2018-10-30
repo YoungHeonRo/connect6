@@ -1,64 +1,52 @@
 class Board:
-    
-    # need documentation
     def __init__(self, size):
-        self.size=19
+        self.size = size
         self.state = [[0 for i in range(size)] for j in range(size)]
-        self.count = 0
-        #self.white_priority = [[0 for i in range(size)] for j in range(size)]
         self.threat = [[0 for i in range(size)] for j in range(size)]
-        self.color = 1
-    def print(self):
-        symbol = ['.', 'o', 'x']
+        self.count = 0
 
-        line = '\n '
-        for i in range(self.size):
-            line = line + format(i, '3d') + ' '
-        print(line + ' x')
-        
-        for i in range(self.size):
-            line = format(i, '2d') + ' '
-            for j in range(self.size):
-                line += symbol[self.state[i][j]] + '   '
-            print(line + '\n')
-        print('y\n')
+    def player_in_turn(self):
+        return 1 if self.count % 4 in [0, 3] else 2
     
     # update the move and print the board
-    # (input: x, y of the move and player's color / output: is_end, winner)
+    # (input: x, y of the move and player's color / output: winner)
     def update(self, x, y):
-        self.state[x][y] = color
-        self.count += 1
-        self.print()
-        return self.check(x, y)
+        #color = 'black' if self.player_in_turn() == 1 else 'white'
+        #print(color + ':', str(x), str(y))
+        
+        self.state[x][y] = self.player_in_turn()
+        winner = self.check(x, y)
 
-    def changeColor(self):
-        self.color = 3 - self.color
+        self.count += 1
+
+        return winner
     
-    # check if the game is end (input: x, y of the last move / output: is_end, winner)
+    # check if the game is end (input: (x, y) of the last move / output: winner)
+    # <winner> 0: draw, 1: black wins, 2: white wins, -1: no winner yet
     def check(self, x, y):
-        #should be changed
-        size=self.size
-        for i in range(6):
-            if x+i-5 >= 0 and x+i < size and len(set(self.state[x+j][y] for j in range(i-5, i+1))) == 1:
-                return True, self.state[x][y]
+        size = self.size
+        winner = self.player_in_turn()
         
         for i in range(6):
-            if y+i-5 >= 0 and y+i < size and len(set(self.state[x][y+j] for j in range(i-5, i+1))) == 1:
-                return True, self.state[x][y]
-       
-        for i in range(6):
-            if x+i-5 >= 0 and x+i < size and y+i-5 >=0 and y+i < size and len(set(self.state[x+j][y+j] for j in range(i-5, i+1))) == 1:
-                return True, self.state[x][y]
+            if x-i >= 0 and x-i+5 < size:
+                if len(set(self.state[x-i+j][y] for j in range(6))) == 1:
+                    return winner
+                
+            if y-i >= 0 and y-i+5 < size:
+                if len(set(self.state[x][y-i+j] for j in range(6))) == 1:
+                    return winner
+                
+            if x-i >= 0 and x-i+5 < size and y-i >= 0 and y-i+5 < size:
+                if len(set(self.state[x-i+j][y-i+j] for j in range(6))) == 1:
+                    return winner
 
-        for i in range(6):
-            if x+i-5 >= 0 and x+i < size and y-i+5 < size and y-i >= 0 and len(set(self.state[x+j][y-j] for j in range(i-5, i+1))) == 1:
-                return True, self.state[x][y]
-            
+            if x-i >= 0 and x-i+5 < size and y+i-5 >= 0 and y+i < size:
+                if len(set(self.state[x-i+j][y+i-j] for j in range(6))) == 1:
+                    return winner
+
         if self.count >= self.size * self.size:
-            return True, -1
+            return 0
 
-        return False, -1
+        return -1
 
-    def clone(self):
-        gb = gameBoard()
-   
+    
