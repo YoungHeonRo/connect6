@@ -1,6 +1,5 @@
 class connect6State:
     def __init__(self):
-        self.
 
 class Node:
     def __init__(self, move = None, parent = None, state = None):
