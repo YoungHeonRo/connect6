@@ -1,7 +1,7 @@
 import tkinter as tk
 
 from Board import *
-from Player import *
+import AI
 
 size = 19
 canvas_size = size*30 + 30
@@ -11,14 +11,13 @@ class Game(tk.Frame):
         super().__init__(master)
         self.pack()
         self.human = 1
-        self.ai = init_player(3 - self.human, 'rb')
         self.init_board()
         self.init_widgets()
 
     def init_board(self):
         self.canvas = tk.Canvas(self, height=canvas_size, width=canvas_size, background='#c98003')
         for x in range(size):
-            self.canvas.create_line(30 + x*30, 30, 30 + x*30, canvas_size-30) 
+            self.canvas.create_line(30 + x*30, 30, 30 + x*30, canvas_size-30)
         for y in range(size):
             self.canvas.create_line(30, 30 + y*30, canvas_size-30, 30 + y*30)
         r = 2
@@ -28,7 +27,7 @@ class Game(tk.Frame):
 
         self.board = Board(size)
         if self.human == 2:
-            self.doMove(size//2, size//2)
+            self.doMove([size//2, size//2])
         self.canvas.bind('<Button-1>', self.getXY)
         self.canvas.pack()
 
@@ -43,43 +42,38 @@ class Game(tk.Frame):
         self.human = 3 - self.human
         self.init_board()
         self.last_move['text'] = 'Hello World'
-    
+
     def getXY(self, event):
         x = round(event.x/30 - 1)
         y = round(event.y/30 - 1)
-        self.doMove(x, y)
-        
-    def doMove(self, x, y):
+        self.doMove([x, y])
+
+    def doMove(self, move):
         board = self.board
-        
+        x, y = move
         if x < 0 or x>= size or y < 0 or y >= size or board.state[x][y] != 0:
-            #print('invalid move')
-            #self.last_move['text'] = 'invalid move'
             return
-        
+
         else:
             r = 10
             color = 'black' if board.player_in_turn() == 1 else 'white'
             self.canvas.create_oval(30 + x*30-r, 30 + y*30-r, 30 + x*30+r, 30 + y*30+r, fill=color)
 
-            winner = board.update(x, y)
+            board.update(x, y)
+
             if self.last_move['text'][:5] == color:
                 self.last_move['text'] += ' / x: ' + str(x) + ', y: ' + str(y)
             else:
                 self.last_move['text'] = color + ' x: ' + str(x) + ', y: ' + str(y)
-            if winner >= 0:
-                #print(['draw', 'black won', 'white won'][winner])
-                self.last_move['text'] = ['draw', 'black won', 'white won'][winner]
+            if board.get_winner() >= 0:
+                self.last_move['text'] = ['draw', 'black won', 'white won'][board.get_winner()]
                 self.canvas.unbind('<Button-1>')
                 return
 
         if board.player_in_turn() != self.human:
-            if board.count % 2 == 1:
-                defensive_moves = self.ai.threatMove(board, [(x,y), board.prev])
-            tx, ty = self.ai.get_move(board, self.ai.defensive_moves)
-            self.doMove(tx,ty)
-        
+            move = AI.predict(board)
+            self.doMove(move)
+
 root = tk.Tk()
 game = Game(root)
 game.mainloop()
-
