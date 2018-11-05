@@ -32,7 +32,7 @@ def predict(board):
             if len(threat_candidate) == 1:
                 board.threat_chosen.append( threat_candidate[0] )
             elif len(threat_candidate) >= 2:
-                board.threat_chosen.append( getMoveList(board, threat_candidate, 1) )
+                board.threat_chosen = getMoveList(board, threat_candidate, 1)
 
         elif threat_len >= 2:
             #defensive moves : i, j, threat value
@@ -43,7 +43,7 @@ def predict(board):
                         temp_board.state[first_i][first_j] = temp_board.player_in_turn()
                         temp_board.state[second_i][second_j] = temp_board.player_in_turn()
                         temp_threat_len = threatSearch(temp_board)
-                        if temp_threat_len == 0 and [(second_i, second_j),(first_i,first_j)] not in threat_candidate:
+                        if temp_threat_len == 0 and [ [second_i, second_j] , [first_i,first_j] ] not in threat_candidate:
                             threat_candidate.append( [(first_i,first_j),(second_i,second_j)] )
                         
             t_list = []
@@ -51,11 +51,17 @@ def predict(board):
             if len(threat_candidate) == 1:
                 board.threat_chosen = threat_candidate[0]
             elif len(threat_candidate) >= 2:
-                for one_list in threat_candidate:
-                    t_list.append( one_list[0] )
-                    t_list.append( one_list[1] )
-                t_list = set(t_list)
-                board.threat_chosen = getMoveList(board, t_list, 2)
+
+                temp_list = []
+                for idx, one_list in enumerate(threat_candidate):
+                    tx1, ty1 = one_list[0]
+                    tx2, ty2 = one_list[1]
+                    t_value = halfMove(board, tx1, ty1) + halfMove(board, tx2, ty2)
+                    temp_list.append( [t_value, idx] )
+                temp_list.sort(key = lambda a:a[0], reverse=True)
+
+                board.threat_chosen = threat_candidate[ temp_list[0][1] ]
+                
         print('threat_chosen :', board.threat_chosen)
 
     if board.threat_chosen != [] :
