@@ -7,6 +7,7 @@ class Board:
         self.count = 0
         self.threat = [[0 for i in range(size)] for j in range(size)]
 
+
     def player_in_turn(self):
         return 1 if self.count % 4 in [0, 3] else 2
 
