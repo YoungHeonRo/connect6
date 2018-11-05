@@ -17,9 +17,10 @@ def predict(board):
 
     threat_chosen=[]
     if board.count % 2 == 1:
+        print('defensive_moves :', defensive_moves)
 
         threat_candidate = []
-        if threat_len >= 1:
+        if threat_len == 1:
             #move = defensive_moves[0]
             for one_i, one_j in defensive_moves:
                 temp_board = copy.deepcopy(board)
@@ -37,16 +38,16 @@ def predict(board):
             #defensive moves : i, j, threat value
             for first_i, first_j in defensive_moves :
                 for second_i, second_j in defensive_moves :
-                    if first_i!=second_i and first_j!=second_j:
+                    if first_i!=second_i or first_j!=second_j :
                         temp_board = copy.deepcopy(board)
                         temp_board.state[first_i][first_j] = temp_board.player_in_turn()
                         temp_board.state[second_i][second_j] = temp_board.player_in_turn()
                         temp_threat_len = threatSearch(temp_board)
-                        if temp_threat_len == 0 :
+                        if temp_threat_len == 0 and [(second_i, second_j),(first_i,first_j)] not in threat_candidate:
                             threat_candidate.append( [(first_i,first_j),(second_i,second_j)] )
                         
             t_list = []
-
+            print('threat_candidate :', threat_candidate)
             if len(threat_candidate) == 1:
                 threat_chosen = threat_candidate[0]
             elif len(threat_candidate) >= 2:
@@ -55,10 +56,11 @@ def predict(board):
                     t_list.append( one_list[1] )
                 t_list = set(t_list)
                 threat_chosen = getMoveList(board, t_list, 2)
+        print('threat_chosen :', threat_chosen)
 
     if threat_chosen != [] :
-        move = threat_chosen[0]
-        threat_chosen.pop(0)
+        move = threat_chosen.pop()
+        print('left :',threat_chosen)
         return move
     else:
         max_score = 0
