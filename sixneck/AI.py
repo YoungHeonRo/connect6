@@ -1,6 +1,8 @@
+import copy
+
 def predict(board):
     if board.count % 2 == 1:
-        threatSearch(board)
+        threat_len = threatSearch(board)
     size = board.size
     state = board.state
 
@@ -12,8 +14,52 @@ def predict(board):
 
     defensive_moves.sort(key=lambda a:a[-1], reverse=True)
     defensive_moves = [[i,j] for i,j,k in defensive_moves]
-    if len(defensive_moves) >= 1:
-        move = defensive_moves[0]
+
+    threat_chosen=[]
+    if board.count % 2 == 1:
+
+        threat_candidate = []
+        if threat_len >= 1:
+            #move = defensive_moves[0]
+            for one_i, one_j in defensive_moves:
+                temp_board = copy.deepcopy(board)
+                temp_board.state[one_i][one_j] = temp_board.player_in_turn()
+                temp_threat_len = threatSearch(temp_board)
+                if temp_threat_len == 0:
+                    threat_candidiate.append( (one_i, one_j) )
+                
+            if len(threat_candidate) == 1:
+                threat_chosen.append( threat_candidate[0] )
+            elif len(threat_candidate) >= 2:
+                threat_chosen.append( getMoveList(board, threat_candidate, 1) )
+
+        elif threat_len >= 2:
+            #defensive moves : i, j, threat value
+            for first_i, first_j in defensive_moves :
+                for second_i, second_j in defensive_moves :
+                    if first_i!=second_i and first_j!=second_j:
+                        temp_board = copy.deepcopy(board)
+                        temp_board.state[first_i][first_j] = temp_board.player_in_turn()
+                        temp_board.state[second_i][second_j] = temp_board.player_in_turn()
+                        temp_threat_len = threatSearch(temp_board)
+                        if temp_threat_len == 0 :
+                            threat_candidate.append( [(first_i,first_j),(second_i,second_j)] )
+                        
+            t_list = []
+
+            if len(threat_candidate) == 1:
+                threat_chosen = threat_candidate[0]
+            elif len(threat_candidate) >= 2:
+                for one_list in threat_candidate:
+                    t_list.append( one_list[0] )
+                    t_list.append( one_list[1] )
+                t_list = set(t_list)
+                threat_chosen = getMoveList(board, t_list, 2)
+
+    if threat_chosen != [] :
+        move = threat_chosen[0]
+        threat_chosen.pop(0)
+        return move
     else:
         max_score = 0
 
@@ -27,8 +73,23 @@ def predict(board):
                 if temp > max_score:
                     max_score = temp
                     move = [x, y]
-
     return move
+
+'''def simulate(board, move_list):
+    b = copy.deepcopy(board)
+    for move in move_list:
+    b.update(move)
+    t = threatSearch(b)
+    return t'''
+
+def getMoveList(board, xy_list, n):
+    xy_score_list = []
+    for x, y in xy_list:
+        score = halfMove(board, x, y)
+        xy_score_list.append([x, y, score])
+    xy_score_list.sort(key=lambda a:a[-1], reverse=True)
+    move_list = list([xy[0], xy[1]] for xy in xy_score_list)
+    return move_list[:n]
 
 def halfMove(board, x, y):
     size = board.size
@@ -77,7 +138,8 @@ def threatSearch(board):
                     window = list(state[x1+dx*i][y1+dy*i] for i in range(1, distance))
                 else:
                     window = list(state[x2+dx*i][y2+dy*i] for i in range(1, distance))
-                if board.player_in_turn() in window:
+            
+                if board.player_in_turn() in window or 3-board.player_in_turn() in window:
                     opponent += 1
                 if opponent == 0: #if there are opposing stones between two stones
                     if distance <= 6:
@@ -126,3 +188,4 @@ def threatSearch(board):
                                 break
 
     print('threat:',threat)
+    return threat
