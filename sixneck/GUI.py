@@ -70,9 +70,10 @@ class Game(tk.Frame):
                 self.canvas.unbind('<Button-1>')
                 return
 
-        if board.player_in_turn() != self.human:
+        if board.player_in_turn() != self.human :
             move = AI.predict(board)
             self.doMove(move)
+
 
 root = tk.Tk()
 game = Game(root)

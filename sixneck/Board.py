@@ -6,7 +6,7 @@ class Board:
         self.prev_moves = [[size//2, size//2], [size//2, size//2]]
         self.count = 0
         self.threat = [[0 for i in range(size)] for j in range(size)]
-
+        self.threat_chosen = []
 
     def player_in_turn(self):
         return 1 if self.count % 4 in [0, 3] else 2

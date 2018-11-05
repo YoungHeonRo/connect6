@@ -15,8 +15,8 @@ def predict(board):
     defensive_moves.sort(key=lambda a:a[-1], reverse=True)
     defensive_moves = [[i,j] for i,j,k in defensive_moves]
 
-    threat_chosen=[]
     if board.count % 2 == 1:
+        board.threat_chosen=[]
         print('defensive_moves :', defensive_moves)
 
         threat_candidate = []
@@ -27,12 +27,12 @@ def predict(board):
                 temp_board.state[one_i][one_j] = temp_board.player_in_turn()
                 temp_threat_len = threatSearch(temp_board)
                 if temp_threat_len == 0:
-                    threat_candidiate.append( (one_i, one_j) )
+                    threat_candidate.append( [one_i, one_j] )
                 
             if len(threat_candidate) == 1:
-                threat_chosen.append( threat_candidate[0] )
+                board.threat_chosen.append( threat_candidate[0] )
             elif len(threat_candidate) >= 2:
-                threat_chosen.append( getMoveList(board, threat_candidate, 1) )
+                board.threat_chosen.append( getMoveList(board, threat_candidate, 1) )
 
         elif threat_len >= 2:
             #defensive moves : i, j, threat value
@@ -49,18 +49,19 @@ def predict(board):
             t_list = []
             print('threat_candidate :', threat_candidate)
             if len(threat_candidate) == 1:
-                threat_chosen = threat_candidate[0]
+                board.threat_chosen = threat_candidate[0]
             elif len(threat_candidate) >= 2:
                 for one_list in threat_candidate:
                     t_list.append( one_list[0] )
                     t_list.append( one_list[1] )
                 t_list = set(t_list)
-                threat_chosen = getMoveList(board, t_list, 2)
-        print('threat_chosen :', threat_chosen)
+                board.threat_chosen = getMoveList(board, t_list, 2)
+        print('threat_chosen :', board.threat_chosen)
 
-    if threat_chosen != [] :
-        move = threat_chosen.pop()
-        print('left :',threat_chosen)
+    if board.threat_chosen != [] :
+        move = board.threat_chosen.pop()
+        print('left :', board.threat_chosen)
+        print('move :', move)
         return move
     else:
         max_score = 0
@@ -99,7 +100,7 @@ def halfMove(board, x, y):
 
     empty = 2
     own = 2
-    exp = 13
+    exp = 13 #6
     W_degree = [1.0, 1.00000181862, 1.00000363725, 1.00000726562]
 
     total_score = 0
