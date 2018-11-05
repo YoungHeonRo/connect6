@@ -1,6 +1,29 @@
 import copy
 
 def predict(board):
+    if board.final_move != [] :
+        return board.final_move.pop()
+
+    print(threatSearch(board, 1))
+    if board.count % 2 == 1 and threatSearch(board, 1) >= 2:
+        offensive_moves = []
+        for i in range(size):
+            for j in range(size):
+                if [i, j] in board.available_moves and board.threat_offense[i][j] >= 2:
+                    offensive_moves.append( [i, j] )
+        
+        for first_i, first_j in offensive_moves:
+            for second_i, second_j in offensive_moves:
+                if (first_i*board.size+first_j) > (second_i*board.size+second_j) :
+                    b=copy.deepcopy(board)
+                    b.update( first_i,first_j )
+                    b.update( second_i, second_j )
+                    if b.get_winner() > 0 :
+                        board.final_move = [ [first_i, first_j], [second_i, second_j] ]
+                        return board.final_move.pop()
+
+
+
     if board.count % 2 == 1:
         threat_len = threatSearch(board)
         print('threat_len :', threat_len)
@@ -39,13 +62,13 @@ def predict(board):
             #defensive moves : i, j, threat value
             for first_i, first_j in defensive_moves :
                 for second_i, second_j in defensive_moves :
-                    if first_i!=second_i or first_j!=second_j :
+                    if (first_i*board.size+first_j) > (second_i*board.size+second_j) :
                         temp_board = copy.deepcopy(board)
                         temp_board.state[first_i][first_j] = temp_board.player_in_turn()
                         temp_board.state[second_i][second_j] = temp_board.player_in_turn()
                         temp_threat_len = threatSearch(temp_board)
                         if temp_threat_len == 0 and [ [second_i, second_j] , [first_i,first_j] ] not in threat_candidate:
-                            threat_candidate.append( [(first_i,first_j),(second_i,second_j)] )
+                            threat_candidate.append( [ [first_i,first_j] , [second_i,second_j] ] )
                         
             t_list = []
             print('threat_candidate :', threat_candidate)
@@ -131,12 +154,22 @@ def halfMove(board, x, y):
 
     return W_degree[degree - 1] * total_score
 
-def threatSearch(board):
-    threat = 0
+def threatSearch(board, mode=0):
+
+    threat_len = 0
     size = board.size
     state = board.state
-    x1, y1 = board.prev_moves[0]
-    x2, y2 = board.prev_moves[1]
+    if mode == 1:
+        x1, y1 = board.prev_mine[0]
+        x2, y2 = board.prev_mine[1]
+        pl_in_turn = 3 - board.player_in_turn()
+        threat = board.threat_offense
+    else :
+        x1, y1 = board.prev_moves[0]
+        x2, y2 = board.prev_moves[1]
+        pl_in_turn = board.player_in_turn()
+        threat = board.threat
+
     for x, y in board.prev_moves:
         for dx, dy in [[1,0], [0,1], [1,1], [1,-1]]:
             def W(x): return x
@@ -149,7 +182,7 @@ def threatSearch(board):
                 else:
                     window = list(state[x2+dx*i][y2+dy*i] for i in range(1, distance))
             
-                if board.player_in_turn() in window or 3-board.player_in_turn() in window:
+                if pl_in_turn in window or 3-pl_in_turn in window:
                     opponent += 1
                 if opponent == 0: #if there are opposing stones between two stones
                     if distance <= 6:
@@ -169,32 +202,32 @@ def threatSearch(board):
                     index = list([x+dx*(-i+j), y+dy*(-i+j)] for j in range(6))
                     index = index[::-1]
                     window = list(state[x][y] for x, y in index)
-                    if board.player_in_turn() not in window and window.count(3 - board.player_in_turn()) >= 4:
+                    if pl_in_turn not in window and window.count(3 - pl_in_turn) >= 4:
                         empty = list([x, y] for x, y in index if state[x][y] == 0)
                         temp = 0
                         for tx, ty in empty:
                             if [tx, ty] not in t:
                                 #print(tx, ty)
                                 t.append([tx, ty])
-                                board.threat[tx][ty] += W2(1)
+                                threat[tx][ty] += W2(1)
                                 temp = 1
                             else:
                                 break
-                        threat += W(temp)
+                        threat_len += W(temp)
 
             t = []
             for i in range(5,-1,-1): #left to right
                 if x+dx*(-i) >= 0 and x+dx*(-i+5) < size and y+dy*(-i) >= 0 and y+dy*(-i+5) < size and y+dy*(-i) < size and y+dy*(-i+5) >= 0:
                     index = list([x+dx*(-i+j), y+dy*(-i+j)] for j in range(6))
                     window = list(state[x][y] for x, y in index)
-                    if board.player_in_turn() not in window and window.count(3 - board.player_in_turn()) >= 4:
+                    if pl_in_turn not in window and window.count(3 - pl_in_turn) >= 4:
                         empty = list([x, y] for x, y in index if state[x][y] == 0)
                         for tx, ty in empty:
                             if [tx, ty] not in t:
                                 #print(tx, ty)
                                 t.append([tx, ty])
-                                board.threat[tx][ty] += W2(1)
+                                threat[tx][ty] += W2(1)
                             else:
                                 break
 
-    return threat
+    return threat_len

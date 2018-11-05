@@ -4,9 +4,12 @@ class Board:
         self.state = [[0 for i in range(size)] for j in range(size)]
         self.available_moves = [[x, y] for x in range(size) for y in range(size)]
         self.prev_moves = [[size//2, size//2], [size//2, size//2]]
-        self.count = 0
+        self.prev_mine = [ [-1,-1], [-1,-1] ]
         self.threat = [[0 for i in range(size)] for j in range(size)]
+        self.threat_offense = [[0 for i in range(size)] for j in range(size)]
+        self.count = 0
         self.threat_chosen = []
+        self.final_move = []
 
     def player_in_turn(self):
         return 1 if self.count % 4 in [0, 3] else 2
@@ -18,6 +21,7 @@ class Board:
     def update(self, x, y):
         self.state[x][y] = self.player_in_turn()
         self.available_moves.remove([x,y])
+        self.prev_mine = self.prev_moves
         self.prev_moves[self.count%2] = [x,y]
         self.count += 1
 
