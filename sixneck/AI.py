@@ -3,6 +3,7 @@ import copy
 def predict(board):
     if board.count % 2 == 1:
         threat_len = threatSearch(board)
+        print('threat_len :', threat_len)
     size = board.size
     state = board.state
 
@@ -17,7 +18,7 @@ def predict(board):
 
     if board.count % 2 == 1:
         board.threat_chosen=[]
-        print('defensive_moves :', defensive_moves)
+        #print('defensive_moves :', defensive_moves)
 
         threat_candidate = []
         if threat_len == 1:
@@ -66,8 +67,8 @@ def predict(board):
 
     if board.threat_chosen != [] :
         move = board.threat_chosen.pop()
-        print('left :', board.threat_chosen)
-        print('move :', move)
+        #print('left :', board.threat_chosen)
+        #print('move :', move)
         return move
     else:
         max_score = 0
@@ -173,7 +174,7 @@ def threatSearch(board):
                         temp = 0
                         for tx, ty in empty:
                             if [tx, ty] not in t:
-                                print(tx, ty)
+                                #print(tx, ty)
                                 t.append([tx, ty])
                                 board.threat[tx][ty] += W2(1)
                                 temp = 1
@@ -190,11 +191,10 @@ def threatSearch(board):
                         empty = list([x, y] for x, y in index if state[x][y] == 0)
                         for tx, ty in empty:
                             if [tx, ty] not in t:
-                                print(tx, ty)
+                                #print(tx, ty)
                                 t.append([tx, ty])
                                 board.threat[tx][ty] += W2(1)
                             else:
                                 break
 
-    print('threat:',threat)
     return threat
