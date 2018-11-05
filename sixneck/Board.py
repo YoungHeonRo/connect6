@@ -3,7 +3,7 @@ class Board:
         self.size = size
         self.state = [[0 for i in range(size)] for j in range(size)]
         self.available_moves = [[x, y] for x in range(size) for y in range(size)]
-        self.prev_moves = [[-100, -100], [-100, -100]]
+        self.prev_moves = [[size//2, size//2], [size//2, size//2]]
         self.count = 0
         self.threat = [[0 for i in range(size)] for j in range(size)]
 
