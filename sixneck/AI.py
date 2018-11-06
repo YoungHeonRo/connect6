@@ -5,7 +5,7 @@ def predict(board):
         return board.final_move.pop()
 
     print('offense threat :', threatSearch(board, 1))
-    if board.count % 2 == 1 and threatSearch(board, 1) >= 2:
+    if board.count % 2 == 1 and threatSearch(board, 1) >= 1:
         offensive_moves = []
         for i in range(board.size):
             for j in range(board.size):
