@@ -115,8 +115,12 @@ def predict(board):
                 if temp > max_score:
                     temp_board = copy.deepcopy(board)
                     temp_board.state[x][y] = 3-temp_board.player_in_turn()
-                    if threatSearch(temp_board) > 0 :              
-                        print('here')
+                    print('here', end=' ')
+                    temp_threat = threatSearch(temp_board)
+                    if  temp_threat> 0 :              
+                        print('pass')
+                        if temp_threat > 2 :
+                            return [x,y]
                         max_score = temp
                         move = [x, y]
 
