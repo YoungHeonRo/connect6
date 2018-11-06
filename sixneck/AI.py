@@ -22,8 +22,6 @@ def predict(board):
                         board.final_move = [ [first_i, first_j], [second_i, second_j] ]
                         return board.final_move.pop()
 
-
-
     if board.count % 2 == 1:
         threat_len = threatSearch(board)
         print('threat_len :', threat_len)
@@ -106,6 +104,16 @@ def predict(board):
                 if temp > max_score:
                     max_score = temp
                     move = [x, y]
+
+        for x, y in board.available_moves:
+            #defensive_strategy
+            #if (abs(x-x1) <= 2 and abs(y-y1) <= 2) or (abs(x-x2) <= 2 and abs(y-y2) <= 2):
+            if True:
+                temp = halfMove(board, x, y, 1)
+                if temp > max_score:
+                    max_score = temp
+                    move = [x, y]
+
     return move
 
 '''def simulate(board, move_list):
@@ -124,7 +132,7 @@ def getMoveList(board, xy_list, n):
     move_list = list([xy[0], xy[1]] for xy in xy_score_list)
     return move_list[:n]
 
-def halfMove(board, x, y):
+def halfMove(board, x, y, mode=0):
     size = board.size
     state = board.state
 
@@ -132,6 +140,11 @@ def halfMove(board, x, y):
     own = 2
     exp = 13 #6
     W_degree = [1.0, 1.00000181862, 1.00000363725, 1.00000726562]
+
+    if mode == 1:
+        pl_in_turn = 3-board.player_in_turn()
+    else :
+        pl_in_turn = board.player_in_turn()
 
     total_score = 0
     total_degree = 0
@@ -144,7 +157,7 @@ def halfMove(board, x, y):
                     break
                 elif state[x+dx*l*k][y+dy*l*k] == 0:
                     score *= empty
-                elif state[x+dx*l*k][y+dy*l*k] == board.player_in_turn():
+                elif state[x+dx*l*k][y+dy*l*k] == pl_in_turn:
                     score *= own**(exp-k)
                 else:
                     degree = 0
