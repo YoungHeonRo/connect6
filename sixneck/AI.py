@@ -11,7 +11,7 @@ def predict(board):
             for j in range(board.size):
                 if [i, j] in board.available_moves and board.threat_offense[i][j] >= 2:
                     offensive_moves.append( [i, j] )
-        
+
         for first_i, first_j in offensive_moves:
             for second_i, second_j in offensive_moves:
                 if (first_i*board.size+first_j) > (second_i*board.size+second_j) :
@@ -50,7 +50,7 @@ def predict(board):
                 temp_threat_len = threatSearch(temp_board)
                 if temp_threat_len == 0:
                     threat_candidate.append( [one_i, one_j] )
-                
+
             if len(threat_candidate) == 1:
                 board.threat_chosen.append( threat_candidate[0] )
             elif len(threat_candidate) >= 2:
@@ -67,7 +67,7 @@ def predict(board):
                         temp_threat_len = threatSearch(temp_board)
                         if temp_threat_len == 0 and [ [second_i, second_j] , [first_i,first_j] ] not in threat_candidate:
                             threat_candidate.append( [ [first_i,first_j] , [second_i,second_j] ] )
-                        
+
             t_list = []
             print('threat_candidate :', threat_candidate)
             if len(threat_candidate) == 1:
@@ -83,7 +83,7 @@ def predict(board):
                 temp_list.sort(key = lambda a:a[0], reverse=True)
 
                 board.threat_chosen = threat_candidate[ temp_list[0][1] ]
-                
+
         print('threat_chosen :', board.threat_chosen)
 
     if board.threat_chosen != [] :
@@ -151,9 +151,12 @@ def halfMove(board, x, y, mode=0):
     for dx, dy in [[1,0], [0,1], [1,1], [1,-1]]:
         score = 1
         degree = 1
+        total_distance = 0
         for l in [-1, 1]:
+            distance = 6
             for k in range(1,6):
                 if x+dx*l*k >= size or x+dx*l*k < 0 or y+dy*l*k >= size or y+dy*l*k < 0:
+                    distance = k
                     break
                 elif state[x+dx*l*k][y+dy*l*k] == 0:
                     score *= empty
@@ -161,9 +164,13 @@ def halfMove(board, x, y, mode=0):
                     score *= own**(exp-k)
                 else:
                     degree = 0
+                    distance = k
                     break
+            total_distance += distance
+
         total_degree += degree
-        total_score += score
+        if total_distance > 6:
+            total_score += score
 
     return W_degree[degree - 1] * total_score
 
@@ -195,7 +202,7 @@ def threatSearch(board, mode=0):
                     window = list(state[x1+dx*i][y1+dy*i] for i in range(1, distance))
                 else:
                     window = list(state[x2+dx*i][y2+dy*i] for i in range(1, distance))
-            
+
                 if pl_in_turn in window or 3-pl_in_turn in window:
                     opponent += 1
                 if opponent == 0: #if there are opposing stones between two stones
