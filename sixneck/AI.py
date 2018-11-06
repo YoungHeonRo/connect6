@@ -113,8 +113,12 @@ def predict(board):
             if True:
                 temp = halfMove(board, x, y, 1)
                 if temp > max_score:
-                    max_score = temp
-                    move = [x, y]
+                    temp_board = copy.deepcopy(board)
+                    temp_board.state[x][y] = 3-temp_board.player_in_turn()
+                    if threatSearch(temp_board) > 0 :              
+                        print('here')
+                        max_score = temp
+                        move = [x, y]
 
     return move
 
