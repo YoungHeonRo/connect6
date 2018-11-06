@@ -4,11 +4,11 @@ def predict(board):
     if board.final_move != [] :
         return board.final_move.pop()
 
-    print(threatSearch(board, 1))
+    print('offense threat :', threatSearch(board, 1))
     if board.count % 2 == 1 and threatSearch(board, 1) >= 2:
         offensive_moves = []
-        for i in range(size):
-            for j in range(size):
+        for i in range(board.size):
+            for j in range(board.size):
                 if [i, j] in board.available_moves and board.threat_offense[i][j] >= 2:
                     offensive_moves.append( [i, j] )
         
@@ -160,17 +160,18 @@ def threatSearch(board, mode=0):
     size = board.size
     state = board.state
     if mode == 1:
-        x1, y1 = board.prev_mine[0]
-        x2, y2 = board.prev_mine[1]
-        pl_in_turn = 3 - board.player_in_turn()
+        prev = board.prev_mine
+        pl_in_turn = 3-board.player_in_turn()
         threat = board.threat_offense
     else :
-        x1, y1 = board.prev_moves[0]
-        x2, y2 = board.prev_moves[1]
+        prev = board.prev_moves
         pl_in_turn = board.player_in_turn()
         threat = board.threat
 
-    for x, y in board.prev_moves:
+    x1, y1 = prev[0]
+    x2, y2 = prev[1]
+
+    for x, y in prev:
         for dx, dy in [[1,0], [0,1], [1,1], [1,-1]]:
             def W(x): return x
             def W2(x): return x

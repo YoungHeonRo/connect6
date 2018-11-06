@@ -21,7 +21,7 @@ class Board:
     def update(self, x, y):
         self.state[x][y] = self.player_in_turn()
         self.available_moves.remove([x,y])
-        self.prev_mine = self.prev_moves
+        self.prev_mine[self.count%2] = self.prev_moves[self.count%2]
         self.prev_moves[self.count%2] = [x,y]
         self.count += 1
 
