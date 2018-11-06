@@ -103,11 +103,11 @@ def predict(board):
             #defensive_strategy
             #if (abs(x-x1) <= 2 and abs(y-y1) <= 2) or (abs(x-x2) <= 2 and abs(y-y2) <= 2):
             if True:
-                temp = halfMove(board, x, y)
-                if temp > max_score:
-                    temp_board = copy.deepcopy(board)
-                    temp_board.state[x][y] = temp_board.player_in_turn()
-                    if threatSearch(temp_board, 1) >= max_threat :
+                temp_board = copy.deepcopy(board)
+                temp_board.state[x][y] = temp_board.player_in_turn()
+                if threatSearch(temp_board, 1) >= max_threat :
+                    temp = halfMove(board, x, y)
+                    if temp > max_score:
                         max_score = temp
                         move = [x, y]
 
