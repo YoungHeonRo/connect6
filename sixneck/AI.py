@@ -1,11 +1,13 @@
 import copy
 
 def predict(board):
+    print()
     if board.final_move != [] :
         return board.final_move.pop()
 
-    print('offense threat :', threatSearch(board, 1))
-    if board.count % 2 == 1 and threatSearch(board, 1) >= 1:
+    offensive_threat = threatSearch(board, 1)
+    if board.count % 2 == 1 and offensive_threat >= 1:
+        print('offense threat :', offensive_threat)
         offensive_moves = []
         for i in range(board.size):
             for j in range(board.size):
@@ -203,9 +205,9 @@ def threatSearch(board, mode=0):
                 else:
                     window = list(state[x2+dx*i][y2+dy*i] for i in range(1, distance))
 
-                if pl_in_turn in window or 3-pl_in_turn in window:
+                if pl_in_turn in window:
                     opponent += 1
-                if opponent == 0: #if there are opposing stones between two stones
+                if opponent == 0: #if there are no opposing stones between two stones
                     if distance <= 6:
                         def W(x): return x/2
                         def W2(x): return x/2
