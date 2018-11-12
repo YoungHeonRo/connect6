@@ -1,13 +1,11 @@
 import copy
 
-def predict(board):
-    print()
+def getFinalMove(board):
     if board.final_move != [] :
         return board.final_move.pop()
 
     offensive_threat = threatSearch(board, 1)
-    if board.count % 2 == 1 and offensive_threat >= 1:
-        print('offense threat :', offensive_threat)
+    if offensive_threat > 0:
         offensive_moves = []
         for i in range(board.size):
             for j in range(board.size):
@@ -18,11 +16,18 @@ def predict(board):
             for second_i, second_j in offensive_moves:
                 if (first_i*board.size+first_j) > (second_i*board.size+second_j) :
                     b=copy.deepcopy(board)
-                    b.update( first_i,first_j )
-                    b.update( second_i, second_j )
+                    b.update(first_i, first_j)
+                    b.update(second_i, second_j)
                     if b.get_winner() > 0 :
                         board.final_move = [ [first_i, first_j], [second_i, second_j] ]
                         return board.final_move.pop()
+
+    return None
+
+def predict(board):
+    final_move = getFinalMove(board)
+    if final_move:
+        return final_move
 
     if board.count % 2 == 1:
         threat_len = threatSearch(board)
@@ -104,7 +109,7 @@ def predict(board):
             #defensive_strategy
             #if (abs(x-x1) <= 2 and abs(y-y1) <= 2) or (abs(x-x2) <= 2 and abs(y-y2) <= 2):
             if True:
-                """                
+                """
                 temp_board = copy.deepcopy(board)
                 temp_board.state[x][y] = temp_board.player_in_turn()
                 if threatSearch(temp_board, 1) >= max_threat :
@@ -124,7 +129,7 @@ def predict(board):
                 temp_board.state[x][y] = 3-temp_board.player_in_turn()
                 temp_threat = threatSearch(temp_board)
                 if  temp_threat > 2 :
-                """              
+                """
                 if temp > max_score:
                     max_score = temp
                     move = [x, y]
