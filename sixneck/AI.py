@@ -95,6 +95,7 @@ def predict(board):
         return move
     else:
         max_score = 0
+        max_score2 = 0
         max_threat = 0
 
         x1, y1 = board.prev_moves[0]
@@ -103,28 +104,30 @@ def predict(board):
             #defensive_strategy
             #if (abs(x-x1) <= 2 and abs(y-y1) <= 2) or (abs(x-x2) <= 2 and abs(y-y2) <= 2):
             if True:
+                """                
                 temp_board = copy.deepcopy(board)
                 temp_board.state[x][y] = temp_board.player_in_turn()
                 if threatSearch(temp_board, 1) >= max_threat :
-                    temp = halfMove(board, x, y)
-                    if temp > max_score:
-                        max_score = temp
-                        move = [x, y]
+                """
+                temp = halfMove(board, x, y)
+                if temp > max_score:
+                    max_score = temp
+                    move = [x, y]
 
         for x, y in board.available_moves:
             #defensive_strategy
             #if (abs(x-x1) <= 2 and abs(y-y1) <= 2) or (abs(x-x2) <= 2 and abs(y-y2) <= 2):
             if True:
                 temp = halfMove(board, x, y, 1)
+                """
+                temp_board = copy.deepcopy(board)
+                temp_board.state[x][y] = 3-temp_board.player_in_turn()
+                temp_threat = threatSearch(temp_board)
+                if  temp_threat > 2 :
+                """              
                 if temp > max_score:
-                    temp_board = copy.deepcopy(board)
-                    temp_board.state[x][y] = 3-temp_board.player_in_turn()
-                    temp_threat = threatSearch(temp_board)
-                    if  temp_threat> 0 :              
-                        if temp_threat > 2 :
-                            return [x,y]
-                        max_score = temp
-                        move = [x, y]
+                    max_score = temp
+                    move = [x, y]
 
     return move
 
