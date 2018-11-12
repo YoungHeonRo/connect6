@@ -1,9 +1,6 @@
 import copy
 
-def getFinalMove(board):
-    if board.final_move != [] :
-        return board.final_move.pop()
-
+def findFinalMoves(board):
     offensive_threat = threatSearch(board, 1)
     if offensive_threat > 0:
         offensive_moves = []
@@ -20,20 +17,14 @@ def getFinalMove(board):
                     b.update(second_i, second_j)
                     if b.get_winner() > 0 :
                         board.final_move = [ [first_i, first_j], [second_i, second_j] ]
-                        return board.final_move.pop()
-
     return None
 
-def predict(board):
-    final_move = getFinalMove(board)
-    if final_move:
-        return final_move
-
-    if board.count % 2 == 1:
-        threat_len = threatSearch(board)
-        print('threat_len :', threat_len)
+def findDefensiveMoves(board):
     size = board.size
     state = board.state
+
+    threat_len = threatSearch(board)
+    print('threat_len :', threat_len)
 
     defensive_moves = []
     for i in range(size):
@@ -44,60 +35,63 @@ def predict(board):
     defensive_moves.sort(key=lambda a:a[-1], reverse=True)
     defensive_moves = [[i,j] for i,j,k in defensive_moves]
 
+    board.threat_chosen=[]
+    #print('defensive_moves :', defensive_moves)
+
+    threat_candidate = []
+    if threat_len == 1:
+        #move = defensive_moves[0]
+        for one_i, one_j in defensive_moves:
+            temp_board = copy.deepcopy(board)
+            temp_board.state[one_i][one_j] = temp_board.player_in_turn()
+            temp_threat_len = threatSearch(temp_board)
+            if temp_threat_len == 0:
+                threat_candidate.append( [one_i, one_j] )
+
+        if len(threat_candidate) == 1:
+            board.threat_chosen.append( threat_candidate[0] )
+        elif len(threat_candidate) >= 2:
+            board.threat_chosen = getMoveList(board, threat_candidate, 1)
+
+    elif threat_len >= 2:
+        #defensive moves : i, j, threat value
+        for first_i, first_j in defensive_moves :
+            for second_i, second_j in defensive_moves :
+                if (first_i*board.size+first_j) > (second_i*board.size+second_j) :
+                    temp_board = copy.deepcopy(board)
+                    temp_board.state[first_i][first_j] = temp_board.player_in_turn()
+                    temp_board.state[second_i][second_j] = temp_board.player_in_turn()
+                    temp_threat_len = threatSearch(temp_board)
+                    if temp_threat_len == 0 and [ [second_i, second_j] , [first_i,first_j] ] not in threat_candidate:
+                        threat_candidate.append( [ [first_i,first_j] , [second_i,second_j] ] )
+
+        t_list = []
+        print('threat_candidate :', threat_candidate)
+        if len(threat_candidate) == 1:
+            board.threat_chosen = threat_candidate[0]
+        elif len(threat_candidate) >= 2:
+            temp_list = []
+            for idx, one_list in enumerate(threat_candidate):
+                tx1, ty1 = one_list[0]
+                tx2, ty2 = one_list[1]
+                t_value = halfMove(board, tx1, ty1) + halfMove(board, tx2, ty2)
+                temp_list.append( [t_value, idx] )
+            temp_list.sort(key = lambda a:a[0], reverse=True)
+
+            board.threat_chosen = threat_candidate[ temp_list[0][1] ]
+
+    print('threat_chosen :', board.threat_chosen)
+
+def predict(board):
     if board.count % 2 == 1:
-        board.threat_chosen=[]
-        #print('defensive_moves :', defensive_moves)
+        findFinalMoves(board)
+        findDefensiveMoves(board)
 
-        threat_candidate = []
-        if threat_len == 1:
-            #move = defensive_moves[0]
-            for one_i, one_j in defensive_moves:
-                temp_board = copy.deepcopy(board)
-                temp_board.state[one_i][one_j] = temp_board.player_in_turn()
-                temp_threat_len = threatSearch(temp_board)
-                if temp_threat_len == 0:
-                    threat_candidate.append( [one_i, one_j] )
+    if board.final_move != []:
+        return board.final_move.pop()
 
-            if len(threat_candidate) == 1:
-                board.threat_chosen.append( threat_candidate[0] )
-            elif len(threat_candidate) >= 2:
-                board.threat_chosen = getMoveList(board, threat_candidate, 1)
-
-        elif threat_len >= 2:
-            #defensive moves : i, j, threat value
-            for first_i, first_j in defensive_moves :
-                for second_i, second_j in defensive_moves :
-                    if (first_i*board.size+first_j) > (second_i*board.size+second_j) :
-                        temp_board = copy.deepcopy(board)
-                        temp_board.state[first_i][first_j] = temp_board.player_in_turn()
-                        temp_board.state[second_i][second_j] = temp_board.player_in_turn()
-                        temp_threat_len = threatSearch(temp_board)
-                        if temp_threat_len == 0 and [ [second_i, second_j] , [first_i,first_j] ] not in threat_candidate:
-                            threat_candidate.append( [ [first_i,first_j] , [second_i,second_j] ] )
-
-            t_list = []
-            print('threat_candidate :', threat_candidate)
-            if len(threat_candidate) == 1:
-                board.threat_chosen = threat_candidate[0]
-            elif len(threat_candidate) >= 2:
-
-                temp_list = []
-                for idx, one_list in enumerate(threat_candidate):
-                    tx1, ty1 = one_list[0]
-                    tx2, ty2 = one_list[1]
-                    t_value = halfMove(board, tx1, ty1) + halfMove(board, tx2, ty2)
-                    temp_list.append( [t_value, idx] )
-                temp_list.sort(key = lambda a:a[0], reverse=True)
-
-                board.threat_chosen = threat_candidate[ temp_list[0][1] ]
-
-        print('threat_chosen :', board.threat_chosen)
-
-    if board.threat_chosen != [] :
-        move = board.threat_chosen.pop()
-        #print('left :', board.threat_chosen)
-        #print('move :', move)
-        return move
+    if board.threat_chosen != []:
+        return board.threat_chosen.pop()
     else:
         max_score = 0
         max_score2 = 0
