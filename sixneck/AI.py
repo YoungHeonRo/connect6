@@ -24,7 +24,7 @@ def findDefensiveMoves(board):
     state = board.state
 
     threat_len = threatSearch(board)
-    print('threat_len :', threat_len)
+    #print('threat_len :', threat_len)
 
     defensive_moves = []
     for i in range(size):
@@ -66,7 +66,7 @@ def findDefensiveMoves(board):
                         threat_candidate.append( [ [first_i,first_j] , [second_i,second_j] ] )
 
         t_list = []
-        print('threat_candidate :', threat_candidate)
+        #print('threat_candidate :', threat_candidate)
         if len(threat_candidate) == 1:
             board.threat_chosen = threat_candidate[0]
         elif len(threat_candidate) >= 2:
@@ -80,7 +80,7 @@ def findDefensiveMoves(board):
 
             board.threat_chosen = threat_candidate[ temp_list[0][1] ]
 
-    print('threat_chosen :', board.threat_chosen)
+    #print('threat_chosen :', board.threat_chosen)
 
 def predict(board):
     if board.count % 2 == 1:
@@ -127,8 +127,10 @@ def predict(board):
                 if temp > max_score:
                     max_score = temp
                     move = [x, y]
-
-    return move
+    try:
+        return move
+    except:
+        return board.available_moves[0]
 
 '''def simulate(board, move_list):
     b = copy.deepcopy(board)
@@ -168,6 +170,7 @@ def halfMove(board, x, y, mode=0):
         total_distance = 0
         for l in [-1, 1]:
             distance = 6
+            stones = 0
             for k in range(1,6):
                 if x+dx*l*k >= size or x+dx*l*k < 0 or y+dy*l*k >= size or y+dy*l*k < 0:
                     distance = k
@@ -175,7 +178,11 @@ def halfMove(board, x, y, mode=0):
                 elif state[x+dx*l*k][y+dy*l*k] == 0:
                     score *= empty
                 elif state[x+dx*l*k][y+dy*l*k] == pl_in_turn:
+                    if stones == 3:
+                        score /= own**(exp-k)
+
                     score *= own**(exp-k)
+                    stones += 1
                 else:
                     degree = 0
                     distance = k

@@ -48,6 +48,10 @@ class Game(tk.Frame):
         y = round(event.y/30 - 1)
         self.doMove([x, y])
 
+    def doMove2(self, moves):
+        for move in moves:
+            doMove(move)
+
     def doMove(self, move):
         board = self.board
         x, y = move
@@ -70,9 +74,11 @@ class Game(tk.Frame):
                 self.canvas.unbind('<Button-1>')
                 return
 
-        if board.player_in_turn() != self.human :
+        #if True: #self-play
+        if board.player_in_turn() != self.human: #human vs AI
             move = AI.predict(board)
             self.doMove(move)
+            #self.doMove2(moves)
 
 
 root = tk.Tk()
