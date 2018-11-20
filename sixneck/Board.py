@@ -1,7 +1,9 @@
+import numpy as np
+
 class Board:
     def __init__(self, size):
         self.size = size
-        self.state = [[0 for i in range(size)] for j in range(size)]
+        self.state = np.zeros((size, size), dtype=int)
         self.available_moves = [[x, y] for x in range(size) for y in range(size)]
         self.prev_moves = [[size//2, size//2], [size//2, size//2]]
         self.prev_mine = [ [-1,-1], [-1,-1] ]
@@ -10,6 +12,8 @@ class Board:
         self.count = 0
         self.threat_chosen = []
         self.final_move = []
+        self.active_area = []
+        self.s_index = 0
 
     def player_in_turn(self):
         return 1 if self.count % 4 in [0, 3] else 2
@@ -17,12 +21,28 @@ class Board:
     def get_last_move(self):
         return self.prev_moves[1-self.count%2]
 
+    def update_active_area(self, half_move, distance=2):
+        size = self.size
+        state = self.state
+        x, y = half_move
+        for dx, dy in [[1,0], [0,1], [1,1], [1,-1]]:
+            for l in [-1, 1]:
+                for k in range(1, distance+1):
+                    tx = x+dx*l*k
+                    ty = y+dy*l*k
+                    if [tx, ty] in self.available_moves and [tx, ty] not in self.active_area:
+                        self.active_area.append([tx, ty])
+        if half_move in self.active_area:
+            self.active_area.remove(half_move)
+
     # input: x, y
-    def update(self, x, y):
+    def update(self, move):
+        x, y = move
         self.state[x][y] = self.player_in_turn()
-        self.available_moves.remove([x,y])
+        self.available_moves.remove(move)
         self.prev_mine[self.count%2] = self.prev_moves[self.count%2]
         self.prev_moves[self.count%2] = [x,y]
+        self.update_active_area(move)
         self.count += 1
 
     # output: winner(0: draw, 1: black wins, 2: white wins, -1: no winner yet)

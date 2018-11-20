@@ -1,7 +1,7 @@
 import tkinter as tk
 
 from Board import *
-import AI
+from AI import Bot
 
 size = 19
 canvas_size = size*30 + 30
@@ -11,6 +11,7 @@ class Game(tk.Frame):
         super().__init__(master)
         self.pack()
         self.human = 1
+        self.AI = Bot(3 - self.human)
         self.init_board()
         self.init_widgets()
 
@@ -39,6 +40,7 @@ class Game(tk.Frame):
 
     def resetBoard(self):
         self.canvas.destroy()
+        self.AI = Bot(self.human)
         self.human = 3 - self.human
         self.init_board()
         self.last_move['text'] = 'Hello World'
@@ -63,7 +65,7 @@ class Game(tk.Frame):
             color = 'black' if board.player_in_turn() == 1 else 'white'
             self.canvas.create_oval(30 + x*30-r, 30 + y*30-r, 30 + x*30+r, 30 + y*30+r, fill=color)
 
-            board.update(x, y)
+            board.update(move)
 
             if self.last_move['text'][:5] == color:
                 self.last_move['text'] += ' / x: ' + str(x) + ', y: ' + str(y)
@@ -76,7 +78,9 @@ class Game(tk.Frame):
 
         #if True: #self-play
         if board.player_in_turn() != self.human: #human vs AI
-            move = AI.predict(board)
+            #mcts = MCTSPlayer(c_puct=5, n_playout=10)
+            #move = mcts.get_action(board)
+            move = self.AI.predict(board)
             self.doMove(move)
             #self.doMove2(moves)
 
