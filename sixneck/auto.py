@@ -83,4 +83,5 @@ if __name__ == "__main__":
                             print(str(depth2) +" "+ str(beam2), end=' vs ')
                             print(str(depth1) +" "+ str(beam1), end=' : ')
                             gg = Game(depth1, beam1, depth2, beam2)
+                            print('\n')
 
