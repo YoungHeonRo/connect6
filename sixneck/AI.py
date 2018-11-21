@@ -24,6 +24,9 @@ class Bot:
             return m1
 
     def beam_search(self, board, depth, beam_size):
+        if (board.size**2 - board.count) < (depth-1)*4 + 2 : 
+            depth = 1
+
         size = board.size
 
         successors = []
@@ -84,6 +87,7 @@ class Bot:
         for dx, dy in [[1,0], [0,1], [1,1], [1,-1]]:
             for i in range(6):
                 if x+dx*(-i) >= 0 and x+dx*(-i+5) < size and y+dy*(-i) >= 0 and y+dy*(-i+5) < size and y+dy*(-i) < size and y+dy*(-i+5) >= 0:
+                    
                     index = list([x+dx*(-i+j), y+dy*(-i+j)] for j in range(6))
                     index = index[::-1]
                     window = list(state[x][y] for x, y in index)
@@ -99,3 +103,4 @@ class Bot:
                         s_index -= opponent_weight[cnt-1]
 
         return s_index
+

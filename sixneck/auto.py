@@ -69,8 +69,8 @@ class Game():
 
 if __name__ == "__main__":
 
-    for depth1 in range(3, 5):
-        for depth2 in range(3, 5):
+    for depth1 in range(3, 6):
+        for depth2 in range(3, 6):
             if depth1 <= depth2:
                 for beam1 in range(1,5):
                     for beam2 in range(1,5):
