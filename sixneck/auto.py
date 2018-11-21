@@ -15,8 +15,8 @@ class Game():
         self.beam1 = beam1
         self.beam2 = beam2
         self.second = 0
-        self.AI = Bot(3 - self.human, depth=self.depth1, beam_size=self.beam1)
-        self.AI2 = Bot(self.human, depth=self.depth2, beam_size=self.beam2)
+        self.AI_white = Bot(3 - self.human, depth=self.depth1, beam_size=self.beam1)
+        self.AI_black = Bot(self.human, depth=self.depth2, beam_size=self.beam2)
         self.self_play = True
         self.init_board()
 
@@ -27,8 +27,8 @@ class Game():
 
     def resetBoard(self):
         self.canvas.destroy()
-        self.AI = Bot(self.human)
-        self.AI2 = Bot(3 - self.human, beam_size=2)
+        self.AI_white = Bot(self.human)
+        self.AI_black = Bot(3 - self.human)
         self.human = 3 - self.human
         self.init_board()
 
@@ -56,13 +56,13 @@ class Game():
                 print("winner : " + win )
                 return win
 
-        if board.player_in_turn() == self.AI.player:
-            print('AI:', end=' ')
-            move = self.AI.predict(board)
+        if board.player_in_turn() == self.AI_white.player:
+            print('AI_white:', end=' ')
+            move = self.AI_white.predict(board)
             self.doMove(move)
-        elif self.self_play == True and board.player_in_turn() == self.AI2.player:
-            print('AI2:', end=' ')
-            move = self.AI2.predict(board)
+        elif self.self_play == True and board.player_in_turn() == self.AI_black.player:
+            print('AI_black:', end=' ')
+            move = self.AI_black.predict(board)
             self.doMove(move)
 
     
