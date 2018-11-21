@@ -49,19 +49,19 @@ class Game():
 
             board.update(move)
 
-            print(color, 'x:', x, 'y:', y)
+            #print(color, 'x:', x, 'y:', y)
             win_color = board.get_winner(move)
             if win_color >= 0:
                 win = 'black' if win_color == 1 else 'white'
-                print("winner : " + win )
+                print(win + " win")
                 return win
 
         if board.player_in_turn() == self.AI_white.player:
-            print('AI_white:', end=' ')
+            #print('AI_white:', end=' ')
             move = self.AI_white.predict(board)
             self.doMove(move)
         elif self.self_play == True and board.player_in_turn() == self.AI_black.player:
-            print('AI_black:', end=' ')
+            #print('AI_black:', end=' ')
             move = self.AI_black.predict(board)
             self.doMove(move)
 
@@ -69,27 +69,18 @@ class Game():
 
 if __name__ == "__main__":
 
-    for depth1 in range(3, 8):
-        for depth2 in range(3, 8):
-            for beam1 in range(1,5):
-                for beam2 in range(1,5):
-                    if beam1 < beam2 :
-                        print(str(depth1) +" "+ str(beam1), end=' vs ')
-                        print(str(depth2) +" "+ str(beam2))
-                        print(" black - ", end=" ")
-                        gg = Game(depth2, beam2, depth1, beam1)
-                        if gg == 'black' :
-                            print("win", end=" ")
-                        else :
-                            print("lose", end=" ")
-                        if( (beam1 == beam2) and (depth1 == depth2) ) :
-                            continue
-                        print(str(depth2) +" "+ str(beam2), end=' vs ')
-                        print(str(depth1) +" "+ str(beam1))
-                        print(" white - ", end=" ")
-                        gg = Game(depth1, beam1, depth2, beam2)
-                        if gg == 'white' :
-                            print("win", end=" ")
-                        else :
-                            print("lose")
+    for depth1 in range(3, 5):
+        for depth2 in range(3, 5):
+            if depth1 <= depth2:
+                for beam1 in range(1,5):
+                    for beam2 in range(1,5):
+                        if beam1 <= beam2 :
+                            print(str(depth1) +" "+ str(beam1), end=' vs ')
+                            print(str(depth2) +" "+ str(beam2), end=' : ')
+                            gg = Game(depth2, beam2, depth1, beam1)
+                            if( (beam1 == beam2) and (depth1 == depth2) ) :
+                                continue
+                            print(str(depth2) +" "+ str(beam2), end=' vs ')
+                            print(str(depth1) +" "+ str(beam1), end=' : ')
+                            gg = Game(depth1, beam1, depth2, beam2)
 
