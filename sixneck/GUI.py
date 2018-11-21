@@ -9,10 +9,11 @@ canvas_size = size*30 + 30
 class Game(tk.Frame):
     def __init__(self, master=None):
         super().__init__(master)
-        self.pack()
         self.human = 1
         self.AI = Bot(3 - self.human)
         self.AI2 = Bot(self.human)
+        self.self_play = False
+        self.pack()
         self.init_board()
         self.init_widgets()
 
@@ -45,16 +46,11 @@ class Game(tk.Frame):
         self.AI2 = Bot(3 - self.human)
         self.human = 3 - self.human
         self.init_board()
-        self.last_move['text'] = 'Hello World'
 
     def getXY(self, event):
         x = round(event.x/30 - 1)
         y = round(event.y/30 - 1)
         self.doMove([x, y])
-
-    def doMove2(self, moves):
-        for move in moves:
-            doMove(move)
 
     def doMove(self, move):
         board = self.board
@@ -69,23 +65,24 @@ class Game(tk.Frame):
 
             board.update(move)
 
+            print(color, 'x:', x, 'y:', y)
             if self.last_move['text'][:5] == color:
                 self.last_move['text'] += ' / x: ' + str(x) + ', y: ' + str(y)
             else:
                 self.last_move['text'] = color + ' x: ' + str(x) + ', y: ' + str(y)
-            if board.get_winner() >= 0:
-                self.last_move['text'] = ['draw', 'black won', 'white won'][board.get_winner()]
+
+            if board.get_winner(move) >= 0:
+                self.last_move['text'] = ['draw', 'black won', 'white won'][board.get_winner(move)]
                 self.canvas.unbind('<Button-1>')
                 return
 
         if board.player_in_turn() == self.AI.player:
-        #if board.player_in_turn() != self.human: #human vs AI
-            print('hello')
+            print('AI:', end=' ')
             move = self.AI.predict(board)
             self.doMove(move)
-        else:
-            print('2')
-            move = self.AI2.predict2(board)
+        elif self.self_play == True and board.player_in_turn() == self.AI2.player:
+            print('AI2:', end=' ')
+            move = self.AI2.predict(board)
             self.doMove(move)
 
 root = tk.Tk()
