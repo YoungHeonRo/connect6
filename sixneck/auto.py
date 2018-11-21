@@ -69,11 +69,11 @@ class Game():
 
 if __name__ == "__main__":
 
-    for depth1 in range(3, 6):
-        for depth2 in range(3, 6):
-            for beam1 in range(1,6):
-                for beam2 in range(1,6):
-                    if depth1 < depth2 and beam1 < beam2 :
+    for depth1 in range(3, 8):
+        for depth2 in range(3, 8):
+            for beam1 in range(1,5):
+                for beam2 in range(1,5):
+                    if beam1 < beam2 :
                         print(str(depth1) +" "+ str(beam1), end=' vs ')
                         print(str(depth2) +" "+ str(beam2))
                         gg = Game(depth1, beam1, depth2, beam2)
