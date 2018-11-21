@@ -6,11 +6,37 @@ class Bot:
         self.player = color
         self.opponent = 3 - color
 
-    def beam_search(self, board, depth, beam_size):
-        pass
+    def beam_search(self, board, depth=2, beam_size=1):
+        size = board.size
+        best_moves = []
+
+        for half_move1 in board.active_area:
+            b = copy.deepcopy(board)
+            b.update(half_move1)
+            for half_move2 in b.active_area:
+                x1, y1 = half_move1
+                x2, y2 = half_move2
+                if x1*size+y1 < x2*size+y2:
+                    score = self.evaluate(board, half_move1) + self.evaluate(b, half_move2)
+                    best_moves.append([half_move1, half_move2, score])
+
+        best_moves.sort(key=lambda a:a[-1], reverse=(board.player_in_turn() == self.player))
+        best_moves = best_moves[:beam_size]
+
+        if depth > 1:
+            children = []
+            for moves in best_moves:
+                b = copy.deepcopy(board)
+                b.update(moves[0])
+                b.update(moves[1])
+                child = self.beam_search(b, depth-1, beam_size)
+                children.append([moves[0], moves[1], child[-1]+moves[-1]])
+            return max(children, key=lambda a:a[-1])
+        else:
+            return best_moves[0]
 
     def evaluate(self, board, half_move):
-        s_index = board.s_index
+        s_index = 0
 
         size = board.size
         state = board.state
@@ -110,8 +136,29 @@ class Bot:
 
         #print('threat_chosen :', board.threat_chosen)
 
-    def predict(self, board):
+    def predict2(self, board):
         if board.count % 2 == 1:
+            board.best_moves.clear()
+            board.final_move.clear()
+            board.threat_chosen.clear()
+            #self.findFinalMoves(board)
+            #self.findDefensiveMoves(board)
+
+        if board.final_move != []:
+            return board.final_move.pop()
+        elif board.threat_chosen != []:
+            return board.threat_chosen.pop()
+        elif board.best_moves != []:
+            return board.best_moves.pop()
+        else:
+            m1, m2, _ = self.beam_search(board, beam_size=2)
+            board.best_moves.append(m2)
+            return m1
+
+    def predict(self, board): #without simulation
+        if board.count % 2 == 1:
+            board.final_move.clear()
+            board.threat_chosen.clear()
             self.findFinalMoves(board)
             self.findDefensiveMoves(board)
 
@@ -124,27 +171,12 @@ class Bot:
             max_score2 = 0
             max_threat = 0
 
-            x1, y1 = board.prev_moves[0]
-            x2, y2 = board.prev_moves[1]
-
             for x, y in board.active_area:
-                #defensive_strategy
-                #if (abs(x-x1) <= 2 and abs(y-y1) <= 2) or (abs(x-x2) <= 2 and abs(y-y2) <= 2):
-                if True:
-                    '''
-                    temp_board = copy.deepcopy(board)
-                    temp_board.state[x][y] = temp_board.player_in_turn()
-                    if threatSearch(temp_board, 1) >= max_threat :
-                    '''
-                    temp = self.evaluate(board, [x, y])
-                    if temp > max_score:
-                        max_score = temp
-                        move = [x, y]
-
-        try:
-            return move
-        except:
-            return board.available_moves[0]
+                temp = self.evaluate(board, [x, y])
+                if temp > max_score:
+                    max_score = temp
+                    move = [x, y]
+        return move
 
     def threatSearch(self, board, mode=0):
 

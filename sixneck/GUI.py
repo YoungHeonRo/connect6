@@ -12,6 +12,7 @@ class Game(tk.Frame):
         self.pack()
         self.human = 1
         self.AI = Bot(3 - self.human)
+        self.AI2 = Bot(self.human)
         self.init_board()
         self.init_widgets()
 
@@ -41,6 +42,7 @@ class Game(tk.Frame):
     def resetBoard(self):
         self.canvas.destroy()
         self.AI = Bot(self.human)
+        self.AI2 = Bot(3 - self.human)
         self.human = 3 - self.human
         self.init_board()
         self.last_move['text'] = 'Hello World'
@@ -76,14 +78,15 @@ class Game(tk.Frame):
                 self.canvas.unbind('<Button-1>')
                 return
 
-        #if True: #self-play
-        if board.player_in_turn() != self.human: #human vs AI
-            #mcts = MCTSPlayer(c_puct=5, n_playout=10)
-            #move = mcts.get_action(board)
+        if board.player_in_turn() == self.AI.player:
+        #if board.player_in_turn() != self.human: #human vs AI
+            print('hello')
             move = self.AI.predict(board)
             self.doMove(move)
-            #self.doMove2(moves)
-
+        else:
+            print('2')
+            move = self.AI2.predict2(board)
+            self.doMove(move)
 
 root = tk.Tk()
 game = Game(root)
