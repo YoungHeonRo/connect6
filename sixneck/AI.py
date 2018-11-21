@@ -19,7 +19,7 @@ class Bot:
             start_time = time.time()
             m1, m2, _ = self.beam_search(board, self.depth, self.beam_size)
             if time.time() - start_time > 20 :
-                print('time taken: ', time.time() - start_time)
+                print('\ntime : ', time.time() - start_time)
             self.best_moves.append(m2)
             return m1
 
