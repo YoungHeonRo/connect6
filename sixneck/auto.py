@@ -49,19 +49,19 @@ class Game():
 
             board.update(move)
 
-            #print(color, 'x:', x, 'y:', y)
+            print(color, 'x:', x, 'y:', y)
             win_color = board.get_winner(move)
             if win_color >= 0:
                 win = 'black' if win_color == 1 else 'white'
                 print("winner : " + win )
-                return
+                return win
 
         if board.player_in_turn() == self.AI.player:
-            #print('AI:', end=' ')
+            print('AI:', end=' ')
             move = self.AI.predict(board)
             self.doMove(move)
         elif self.self_play == True and board.player_in_turn() == self.AI2.player:
-            #print('AI2:', end=' ')
+            print('AI2:', end=' ')
             move = self.AI2.predict(board)
             self.doMove(move)
 
@@ -76,10 +76,20 @@ if __name__ == "__main__":
                     if beam1 < beam2 :
                         print(str(depth1) +" "+ str(beam1), end=' vs ')
                         print(str(depth2) +" "+ str(beam2))
-                        gg = Game(depth1, beam1, depth2, beam2)
+                        print(" black - ", end=" ")
+                        gg = Game(depth2, beam2, depth1, beam1)
+                        if gg == 'black' :
+                            print("win", end=" ")
+                        else :
+                            print("lose", end=" ")
                         if( (beam1 == beam2) and (depth1 == depth2) ) :
                             continue
                         print(str(depth2) +" "+ str(beam2), end=' vs ')
                         print(str(depth1) +" "+ str(beam1))
-                        gg = Game(depth2, beam1, depth2, beam1)
+                        print(" white - ", end=" ")
+                        gg = Game(depth1, beam1, depth2, beam2)
+                        if gg == 'white' :
+                            print("win", end=" ")
+                        else :
+                            print("lose")
 
