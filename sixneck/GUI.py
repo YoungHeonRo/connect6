@@ -11,8 +11,8 @@ class Game(tk.Frame):
         super().__init__(master)
         self.human = 1
         self.AI = Bot(3 - self.human)
-        self.AI2 = Bot(self.human)
-        self.self_play = False
+        self.AI2 = Bot(self.human, depth=5, beam_size=2)
+        self.self_play = True
         self.pack()
         self.init_board()
         self.init_widgets()
@@ -43,7 +43,7 @@ class Game(tk.Frame):
     def resetBoard(self):
         self.canvas.destroy()
         self.AI = Bot(self.human)
-        self.AI2 = Bot(3 - self.human)
+        self.AI2 = Bot(3 - self.human, beam_size=2)
         self.human = 3 - self.human
         self.init_board()
 

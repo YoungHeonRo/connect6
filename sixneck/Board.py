@@ -5,6 +5,7 @@ class Board:
         self.available_moves = [[x, y] for x in range(size) for y in range(size)]
         self.active_area = []
         self.count = 0
+        self.winner = -1
 
     def player_in_turn(self):
         return 1 if self.count % 4 in [0, 3] else 2
@@ -41,21 +42,21 @@ class Board:
         x, y = move
         size = self.size
         state = self.state
-        winner = state[x][y]
+        self.winner = state[x][y]
 
         for i in range(6):
             if x-i >= 0 and x-i+5 < size:
                 if len(set(state[x-i+j][y] for j in range(6))) == 1:
-                    return winner
+                    return self.winner
             if y-i >= 0 and y-i+5 < size:
                 if len(set(state[x][y-i+j] for j in range(6))) == 1:
-                    return winner
+                    return self.winner
             if x-i >= 0 and x-i+5 < size and y-i >= 0 and y-i+5 < size:
                 if len(set(state[x-i+j][y-i+j] for j in range(6))) == 1:
-                    return winner
+                    return self.winner
             if x-i >= 0 and x-i+5 < size and y+i-5 >= 0 and y+i < size:
                 if len(set(state[x-i+j][y+i-j] for j in range(6))) == 1:
-                    return winner
+                    return self.winner
 
         if self.count >= size * size:
             return 0

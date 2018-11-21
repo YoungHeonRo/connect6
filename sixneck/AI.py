@@ -16,9 +16,10 @@ class Bot:
         if self.best_moves != []:
             return self.best_moves.pop()
         else:
-            #start_time = time.time()
+            start_time = time.time()
             m1, m2, _ = self.beam_search(board, self.depth, self.beam_size)
-            #print('time taken: ', time.time() - start_time)
+            if time.time() - start_time > 20 :
+                print('time taken: ', time.time() - start_time)
             self.best_moves.append(m2)
             return m1
 
