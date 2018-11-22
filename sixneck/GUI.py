@@ -10,8 +10,8 @@ class Game(tk.Frame):
     def __init__(self, master=None):
         super().__init__(master)
         self.human = 1
-        self.AI = Bot(3 - self.human)
-        self.AI2 = Bot(self.human)
+        self.AI = Bot(3 - self.human, 1, 1, id=1)
+        self.AI2 = Bot(self.human, 1, 1, id=2)
         self.self_play = False
         self.pack()
         self.init_board()
@@ -42,8 +42,8 @@ class Game(tk.Frame):
 
     def resetBoard(self):
         self.canvas.destroy()
-        self.AI = Bot(self.human)
-        self.AI2 = Bot(3 - self.human)
+        self.AI.switch()
+        self.AI2.switch()
         self.human = 3 - self.human
         self.init_board()
 
@@ -66,22 +66,23 @@ class Game(tk.Frame):
             board.update(move)
 
             print(color, 'x:', x, 'y:', y)
+
             if self.last_move['text'][:5] == color:
                 self.last_move['text'] += ' / x: ' + str(x) + ', y: ' + str(y)
             else:
                 self.last_move['text'] = color + ' x: ' + str(x) + ', y: ' + str(y)
 
             if board.get_winner(move) >= 0:
+                print(['draw', 'black won', 'white won'][board.get_winner(move)])
                 self.last_move['text'] = ['draw', 'black won', 'white won'][board.get_winner(move)]
                 self.canvas.unbind('<Button-1>')
+
                 return
 
         if board.player_in_turn() == self.AI.player:
-            print('AI:', end=' ')
             move = self.AI.predict(board)
             self.doMove(move)
         elif self.self_play == True and board.player_in_turn() == self.AI2.player:
-            print('AI2:', end=' ')
             move = self.AI2.predict(board)
             self.doMove(move)
 
